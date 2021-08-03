@@ -1,15 +1,18 @@
-import React from "react";
-import todoListItemSublistForm from "./todoListItemSublistForm";
-
+import React, { useState } from "react";
 import shortid from "../../node_modules/shortid";
 
-const TodolistItem = (
+const TodolistItem = ({
   item,
-  swapBtn,
+  todoListItemBtn,
   updateTodoListItem,
-  sublistInputValue,
-  updateSublistInputValue
-) => {
+  formSubmit,
+  // createItem,
+}) => {
+  const [sublistInputValue, setSublistInputValue] = useState("");
+  const updateSublistInputValue = (event) => {
+    setSublistInputValue(event.target.value);
+  };
+
   const id = shortid.generate();
   return (
     <li key={id}>
@@ -18,7 +21,7 @@ const TodolistItem = (
         type="button"
         name="up"
         onClick={() => {
-          swapBtn("up", item.id);
+          todoListItemBtn("up", item.id);
         }}
       >
         UP
@@ -27,7 +30,7 @@ const TodolistItem = (
         type="button"
         name="down"
         onClick={() => {
-          swapBtn("down", item.id);
+          todoListItemBtn("down", item.id);
         }}
       >
         DOWN
@@ -36,7 +39,7 @@ const TodolistItem = (
         type="button"
         name="delete"
         onClick={() => {
-          swapBtn("delete", item.id);
+          todoListItemBtn("delete", item.id);
         }}
       >
         DELETE
@@ -52,21 +55,29 @@ const TodolistItem = (
           ADD SUBLIST
         </button>
       ) : null}
-
+      {item.sublist ? <ul>
+        {item.sublist.map((sublistItem)=>{
+          return (
+            <li key={shortid.generate()}>{sublistItem}</li>
+          )
+        })}
+      </ul>:null}
       {item.sublistMenu ? (
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
+          onSubmit={(event) => {
+            event.preventDefault();
+            formSubmit(item.id, sublistInputValue);
           }}
         >
           <input
             type="text"
             className="todoInput"
             name="sublistInput"
+            autoFocus={true}
             onChange={updateSublistInputValue}
             value={sublistInputValue}
           ></input>
-          <button type="submit">ADD SUB</button>
+          <button type="submit" >ADD SUB</button>
           <button
             type="button"
             onClick={() => {
@@ -75,9 +86,9 @@ const TodolistItem = (
           >
             X
           </button>
-        </form>
+         </form>
       ) : null}
     </li>
   );
-}
+};
 export default TodolistItem;

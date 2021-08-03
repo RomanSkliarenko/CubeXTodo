@@ -5,9 +5,20 @@ import shortid from "../../node_modules/shortid";
 function Todo() {
   const [todoList, setTodoList] = useState([]);
   const [todoInputValue, setTodoInputValue] = useState("");
-  const [sublistInputValue, setSublistInputValue] = useState("");
-  const updateSublistInputValue = (event) => {
-    setSublistInputValue(event.target.value);
+
+  const formSubmit = (id, sublistItem) => {
+    setTodoList((todoList) =>
+      todoList.map((elem) => {
+        if (elem.id !== id) {
+          return elem;
+        } else
+          return {
+            ...elem,
+            sublistMenu: !elem.sublistMenu,
+            sublist: [...elem.sublist, sublistItem],
+          };
+      })
+    );
   };
 
   const todoListItemBtn = (name, id) => {
@@ -51,6 +62,19 @@ function Todo() {
     );
   };
 
+  // const createItem = (event, item) => {
+  //   console.log(item);
+  //   return (
+  //     <TodolistItem
+  //       key={shortid.generate()}
+  //       item={item}
+  //       todoListItemBtn={todoListItemBtn}
+  //       updateTodoListItem={updateTodoListItem}
+  //       formSubmit={formSubmit}
+  //     />
+  //   );
+  // };
+
   return (
     <div className="todoContainer">
       <form
@@ -81,15 +105,17 @@ function Todo() {
         </button>
       </form>
       <ul className="todoList">
-        {todoList.map((item) =>
-          TodolistItem(
-            item,
-            todoListItemBtn,
-            updateTodoListItem,
-            sublistInputValue,
-            updateSublistInputValue
-          )
-        )}
+        {todoList.map((item) => (
+          <TodolistItem
+            key={shortid.generate()}
+            item={item}
+            todoListItemBtn={todoListItemBtn}
+            updateTodoListItem={updateTodoListItem}
+            formSubmit={formSubmit}
+            // createItem={createItem}
+            todoListItem={TodolistItem}
+          />
+        ))}
       </ul>
     </div>
   );
