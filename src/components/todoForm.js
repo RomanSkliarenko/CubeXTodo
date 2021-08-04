@@ -2,58 +2,28 @@ import React, { useState } from "react";
 import ListItem from "./listItem";
 import shortid from "../../node_modules/shortid";
 
-export function Todo({list = []}) {
-  const [todoList, setTodoList] = useState([ ...list]);
+export function Todo({ list = [] }) {
+  const [todoList, setTodoList] = useState([...list]);
   const [todoInputValue, setTodoInputValue] = useState("");
 
-
   const addTodo = (todoTitle) => {
-    setTodoList([
-      ...todoList,
-      {
-        id: shortid.generate(),
-        content: todoTitle,
-        sublistMenu: false,
-        sublist: [],
-      },
-    ]);
-    setTodoInputValue("");
-  }
-// ----------- для кнопок up/down/delete
-  const updateTodo = (id) => {
-    setTodoList((todoList) =>
-      todoList.map((elem) => {
-        if (elem.id !== id) {
-          return elem;
-        } else
-          return {
-            ...elem,
-            sublistMenu: !elem.sublistMenu,
-          };
-      })
-    );
+    const updateTitle = todoTitle.split(" ")
+    console.log(updateTitle)
+    if (todoTitle !== "") {
+      setTodoList([
+        ...todoList,
+        {
+          id: shortid.generate(),
+          content: todoTitle,
+          sublistMenu: false,
+          sublist: [],
+        },
+      ]);
+      setTodoInputValue("");
+    } else {
+      alert("Write something in field! :)")
+    }
   };
-// -------------------------------------
-  const addTodoSublist = (id,sublistTitle) => {
-    setTodoList((todoList) =>
-      todoList.map((elem) => {
-        if (elem.id !== id) {
-          return elem;
-        } else
-          return {
-            ...elem,
-            // sublistMenu: !elem.sublistMenu,
-            sublist: [...elem.sublist, {
-              id: shortid.generate(),
-              content: sublistTitle,
-              sublistMenu: false,
-              sublist: [],
-            }],
-          };
-      })
-    );
-  }
-
   const todoListItemBtn = (name, id) => {
     let todoIndex = todoList.findIndex((el) => {
       if (el.id === id) {
@@ -76,43 +46,41 @@ export function Todo({list = []}) {
       setTodoList(newTodoList);
     }
   };
-
   const updateTodoInputValue = (event) => {
     setTodoInputValue(event.target.value);
   };
 
   return (
-    <div className="todoContainer">
-      <form
-        className="todoForm"
-        onSubmit={(event) => {
-          event.preventDefault();
-          addTodo(todoInputValue)
-        }}
-      >
+    <>
+    <div className="wrapper">
         <input
+        placeholder="type what you want todo"
           type="text"
           className="todoInput"
           name="addTodoInputValue"
           onChange={updateTodoInputValue}
           value={todoInputValue}
         ></input>
-        <button type="submit" className="todoButton">
-          ADD task
+        <button
+          type="button"
+          className="button"
+          onClick={() => {
+            addTodo(todoInputValue);
+          }}
+        >
+          ➕
         </button>
-      </form>
+        </div>
       <ul className="todoList">
         {todoList.map((item) => (
           <ListItem
             key={shortid.generate()}
-            item={item} /**елемент todo который раскладывается в listItem */
-            todoListItemBtn={todoListItemBtn} /*кнопки UP / DOWN / DELETE */
-            updateTodo={updateTodo} /*флаг в todo для работы кнопок UP / DOWN / DELETE*/
-            addTodoSublist={addTodoSublist} /**добавление sublist в todo */
+            item={item}
+            todoListItemBtn={todoListItemBtn}
           />
         ))}
       </ul>
-    </div>
+      </>
   );
 }
 export default Todo;
