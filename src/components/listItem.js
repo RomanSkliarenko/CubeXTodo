@@ -1,17 +1,39 @@
 import React, { useState } from "react";
-import shortid from "../../node_modules/shortid";
+import shortid from "shortid";
+import Todo from "./todoForm";
 
-const TodolistItem = ({
-  item,
-  todoListItemBtn,
-  updateTodoListItem,
-  formSubmit,
-  // createItem,
-}) => {
+const ListItem = ({ item, todoListItemBtn, updateTodo, addTodoSublist }) => {
   const [sublistInputValue, setSublistInputValue] = useState("");
+  const [sublists, setSublists] = useState([...item.sublist]);
   const updateSublistInputValue = (event) => {
     setSublistInputValue(event.target.value);
   };
+  const updateSubItem = (id) => {
+    setSublists((sublists) =>
+      sublists.map((elem) => {
+        if (elem.id !== id) {
+          return elem;
+        } else
+          return {
+            ...elem,
+            sublistMenu: !elem.sublistMenu,
+          };
+      })
+    );
+  };
+  const addItemSublist = (sublistsItem) => {
+    setSublists([
+      ...sublists,
+      {
+        id: shortid.generate(),
+        content: sublistsItem,
+        sublistMenu: false,
+        sublist: [],
+      },
+    ]);
+    setSublistInputValue("");
+  };
+  
 
   const id = shortid.generate();
   return (
@@ -49,24 +71,17 @@ const TodolistItem = ({
           type="button"
           name="addSublist"
           onClick={() => {
-            updateTodoListItem(item.id);
+            updateTodo(item.id);
           }}
         >
           ADD SUBLIST
         </button>
       ) : null}
-      {item.sublist ? <ul>
-        {item.sublist.map((sublistItem)=>{
-          return (
-            <li key={shortid.generate()}>{sublistItem}</li>
-          )
-        })}
-      </ul>:null}
       {item.sublistMenu ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            formSubmit(item.id, sublistInputValue);
+            addTodoSublist(item.id, sublistInputValue);
           }}
         >
           <input
@@ -77,18 +92,22 @@ const TodolistItem = ({
             onChange={updateSublistInputValue}
             value={sublistInputValue}
           ></input>
-          <button type="submit" >ADD SUB</button>
+          <button type="submit">ADD SUB</button>
           <button
             type="button"
             onClick={() => {
-              updateTodoListItem(item.id);
+              updateTodo(item.id);
             }}
           >
             X
           </button>
-         </form>
+        </form>
       ) : null}
+            {!!sublists.length && 
+      <Todo list={sublists}/>   
+      }
+      
     </li>
   );
 };
-export default TodolistItem;
+export default ListItem;
